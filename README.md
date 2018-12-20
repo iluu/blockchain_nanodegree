@@ -13,5 +13,5 @@ To setup the project for review do the following:
 ## Testing the project
 
 The file __simpleChain.js__ contains methods that allow testing the implementation.
-By default file is configured to feed the blockchain with some sample data, to test the required implementation please call specific `test` functions.
+By default file is configured to feed the blockchain with some sample data. To test the specifics of the implementation please call corresponding `test` function.
 
