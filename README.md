@@ -94,6 +94,7 @@ curl -v localhost:8000/status
     "chainHeight":2,
     "valid":true
 }
+```
 
 ## Resources
 1) [HapiJS](https://hapijs.com/)
