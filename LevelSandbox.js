@@ -1,53 +1,82 @@
-/* ===== Persist data with LevelDB ==================
-|  Learn more: level: https://github.com/Level/level |
-/===================================================*/
+'use strict';
 
-const level = require('level');
+const Level = require('level');
+
 const chainDB = './chaindata';
 
 class LevelSandbox {
 
     constructor() {
-        this.db = level(chainDB);
+
+        this.db = Level(chainDB);
     }
 
-    // Get data from levelDB with key (Promise)
+    /**
+     * Get data from levelDB with key
+     * @param {*} key
+     */
     getLevelDBData(key){
-        let self = this;
-        return new Promise(function(resolve, reject) {
-            self.db.get(key, function(err, value){
-                if (err) return console.log('LS: Value for key [' + key +'] not found', err);
+
+        const self = this;
+        return new Promise((resolve, reject) => {
+
+            self.db.get(key, (err, value) => {
+
+                if (err) {
+                    console.log(`LS: Value for key: [${key}] not found`, err);
+                    reject(err);
+                }
+
                 resolve(value);
-            })
+            });
         });
     }
 
-    // Add data to levelDB with key and value (Promise)
+    /**
+     * Add data to levelDB with key and value
+     * @param {*} key
+     * @param {*} value
+     */
     addLevelDBData(key, value) {
-        let self = this;
-        return new Promise(function(resolve, reject) {
-            self.db.put(key, value, function(err) {
-                if (err) return console.log('LS: Failed to store new value for key [' + key, err);
-                resolve(value)
-            })
+
+        const self = this;
+        return new Promise((resolve, reject) => {
+
+            self.db.put(key, value, (err) => {
+
+                if (err) {
+                    console.log('LS: Failed to store new value for key [' + key, err);
+                    reject(err);
+                }
+
+                resolve(value);
+            });
         });
     }
 
-    // Method that return the height
+    /**
+     * Returns number of blocks stored in LevelDB
+     */
     getBlocksCount() {
-        let self = this;
+
+        const self = this;
         let count = 0;
-        return new Promise(function(resolve, reject){
+        return new Promise((resolve, reject) => {
+
             self.db.createReadStream()
-                .on('data', function(data){
+                .on('data', (data) => {
+
                     count++;
                 })
-                .on('error', function(err){
+                .on('error', (err) => {
+
+                    console.log(`LS: getBlocsCount error: ${err}`);
                     reject(err);
                 })
-                .on('close', function(){
+                .on('close', () => {
+
                     resolve(count);
-                })
+                });
         });
     }
 }

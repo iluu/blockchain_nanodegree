@@ -1,134 +1,156 @@
-/* ===== Blockchain Class ==========================
-|  Class with a constructor for new blockchain 		|
-|  ================================================*/
+'use strict';
 
 const SHA256 = require('crypto-js/sha256');
 const LevelSandbox = require('./LevelSandbox.js');
 const Block = require('./Block.js');
 
+/**
+ * Stores and validates blockchain using LevelDB
+ */
 class Blockchain {
 
     constructor() {
+
         this.bd = new LevelSandbox.LevelSandbox();
-        this.generateGenesisBlock();
     }
 
-    // Auxiliar method to create a Genesis Block (always with height=0)
-    // You have two options, because the method will always execute when you create your blockchain
-    // you will need to set this up statically or instead you can verify if the height !== 0 then you
-    // will not create the genesis block
     generateGenesisBlock(){
-        let self = this;
-        this.getBlockHeight()
-            .then((height) => {
-                if (height === 0) {
-                    let genesisBlock = new Block.Block('Genesis Block');
-                    genesisBlock.time = self.getCurrentTime();
-                    genesisBlock.hash = SHA256(JSON.stringify(genesisBlock)).toString();
-                
-                    return self.bd.addLevelDBData(genesisBlock.height, JSON.stringify(genesisBlock));
-                } else {
-                    console.log('BC: Blockchain already initialised, current height: ' + height);
-                }
-            })
+
+        const genesisBlock = new Block.Block('Genesis Block');
+        genesisBlock.time = this.getCurrentTime();
+        genesisBlock.hash = SHA256(JSON.stringify(genesisBlock)).toString();
+
+        return genesisBlock;
     }
 
-    // Get block height, it is auxiliar method that return the height of the blockchain
     getBlockHeight() {
+
+        const self = this;
         return this.bd.getBlocksCount()
+            .then((height) => {
+
+                if (height === 0) {
+                    return self.bd.addLevelDBData(0, JSON.stringify(self.generateGenesisBlock()))
+                        .then(() => {
+
+                            return 1;
+                        });
+                }
+
+                return height;
+            });
     }
 
-    // Add new block
     addBlock(block) {
-        let self = this;
 
+        const self = this;
         return self.getBlockHeight()
-            .then((it) => self.getBlock(it-1))
+            .then((it) => self.getBlock(it - 1))
             .then((previousBlock) => {
+
                 block.height = previousBlock.height + 1;
                 block.previousBlockHash = previousBlock.hash;
                 block.time = self.getCurrentTime();
                 block.hash = SHA256(JSON.stringify(block)).toString();
-                return self.bd.addLevelDBData(block.height, JSON.stringify(block));    
+                return self.bd.addLevelDBData(block.height, JSON.stringify(block)).then(JSON.parse);
             });
     }
-    
+
     getCurrentTime() {
+
         return new Date().getTime().toString().slice(0, -3);
     }
 
-    // Get Block By Height
     getBlock(height) {
-        return this.bd.getLevelDBData(height).then(JSON.parse);
+
+        const self = this;
+        return this.getBlockHeight()
+            .then((blockchainHeight) => {
+
+                if (height < blockchainHeight) {
+                    return self.bd.getLevelDBData(height).then(JSON.parse);
+                }
+
+                return null;
+            });
     }
 
-    // Validate if Block is being tampered by Block Height
     validateBlock(height) {
+
         return this.getBlock(height)
             .then((block) => {
-                let originalHash = block.hash;
+
+                const originalHash = block.hash;
                 block.hash = '';
 
-                let blockHash = SHA256(JSON.stringify(block)).toString();
+                const blockHash = SHA256(JSON.stringify(block)).toString();
                 return [block.height, blockHash === originalHash];
             });
     }
 
-    // Validate block in chain, apart from validation of the block itself it does also validation 
-    // of the link (previousBlock.hash = block.hash)
     validateBlockInChain(height) {
-        let self = this;
-        let blocks = [
+
+        const blocks = [
             this.getBlock(height),
             this.getBlock(height + 1)
         ];
         return Promise.all(blocks)
-            .then(results => {
+            .then((results) => {
+
                 results[0].hash = '';
-                
-                let blockHash = SHA256(JSON.stringify(results[0])).toString();
+
+                const blockHash = SHA256(JSON.stringify(results[0])).toString();
                 return [results[0].height, (results[1].previousBlockHash === blockHash)];
-            });    
+            });
     }
 
-    // Validate Blockchain
     validateChain() {
-        let self = this;
-        return this.getBlockHeight().then((height) => {
-            let validations = [];
-            let i = 0;
 
-            for (i = 0; i < height; i++){
-                if (i < height-1){
+        const self = this;
+        return this.getBlockHeight().then((height) => {
+
+            const validations = [];
+
+            for (let i = 0; i < height; ++i){
+                if (i < height - 1){
                     validations.push(self.validateBlockInChain(i));
-                } else {
+                }
+                else {
                     validations.push(self.validateBlock(i));
                 }
             }
 
-            // compose required errorLog
             return Promise.all(validations).then((results) => {
-                let errorLog = [];
-                results.forEach(element => {
-                    if (!element[1]) errorLog.push(element[0]);
+
+                const errorLog = [];
+                results.forEach((element) => {
+
+                    if (!element[1]) {
+                        errorLog.push(element[0]);
+                    }
                 });
                 return errorLog;
             });
-        })
-    }
-
-    // Utility Method to Tamper a Block for Test Validation
-    // This method is for testing purpose
-    _modifyBlock(height, block) {
-        let self = this;
-        return new Promise( (resolve, reject) => {
-            self.bd.addLevelDBData(height, JSON.stringify(block).toString())
-            .then((blockModified) => {
-                resolve(blockModified);
-            }).catch((err) => { console.log(err); reject(err)});
         });
     }
-   
+
+    _modifyBlock(height, block) {
+
+        const self = this;
+        return new Promise((resolve, reject) => {
+
+            self.bd.addLevelDBData(height, JSON.stringify(block).toString())
+                .then((blockModified) => {
+
+                    resolve(blockModified);
+                })
+                .catch((err) => {
+
+                    console.log(err);
+                    reject(err);
+                });
+        });
+    }
 }
 
 module.exports.Blockchain = Blockchain;

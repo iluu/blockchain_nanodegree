@@ -1,15 +1,21 @@
 {
-  "name": "project_2",
-  "version": "1.0.0",
-  "description": "",
+  "name": "private_blockchain_nanodegree",
+  "version": "1.0.1",
+  "description": "Private Blockchain Project for Blockchain Developer Nanodegree Program",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "rm -rf chaindata/ && node app.js",
+    "test": "rm -rf chaindata/ && node node_modules/lab/bin/lab -v -L"
   },
-  "author": "",
+  "author": "Karolina Kafel (https://github.com/iluu)",
   "license": "ISC",
   "dependencies": {
     "crypto-js": "^3.1.9-1",
+    "hapi": "^17.8.1",
     "level": "^4.0.0"
+  },
+  "devDependencies": {
+    "code": "^5.2.4",
+    "lab": "^18.0.1"
   }
 }
