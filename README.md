@@ -88,7 +88,6 @@ curl -v localhost:8000/status
 < accept-ranges: bytes
 < Date: Sat, 19 Jan 2019 21:40:17 GMT
 < Connection: keep-alive
-<
 
 {   
     "chainHeight":2,
