@@ -1,9 +1,9 @@
-# Project 3 - Private Blockchain with REST API
+# Project 4 - Private Blockchain Star Notary Service
 
 Changes: 
-- v1.0.2 - implemented star notary service, added Joi and Boom?
-- v1.0.1 - added REST API with HapiJS that allows adding new blocks and inspecting blockchain
-- v1.0.0 - simple private blockchain implementation with LevelDB
+- v1.0.2 - implemented star notary service
+- [v1.0.1](https://github.com/iluu/blockchain_nanodegree/releases/tag/v1.0.1) - added REST API with HapiJS that allows adding new blocks and inspecting blockchain
+- [v1.0.0](https://github.com/iluu/blockchain_nanodegree/releases/tag/v1.0.0) - simple private blockchain implementation with LevelDB
 
 ## Setup project for Review
 
