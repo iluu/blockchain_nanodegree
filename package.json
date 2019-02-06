@@ -13,13 +13,14 @@
     "bitcoinjs-lib": "^4.0.2",
     "bitcoinjs-message": "^2.0.0",
     "body-parser": "^1.18.3",
-    "hex2ascii": "0.0.3",
     "crypto-js": "^3.1.9-1",
     "hapi": "^17.8.1",
+    "hex2ascii": "0.0.3",
     "level": "^4.0.0"
   },
   "devDependencies": {
     "code": "^5.2.4",
-    "lab": "^18.0.1"
+    "lab": "^18.0.1",
+    "lolex": "^3.0.0"
   }
 }

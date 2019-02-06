@@ -5,7 +5,7 @@ const Hapi = require('hapi');
 /**
  * Class Definition for the REST API
  */
-class BlockAPI {
+class StarNotaryAPI {
 
     /**
      * Constructor that allows initialize the class
@@ -14,8 +14,8 @@ class BlockAPI {
 
         this.server = Hapi.Server({
             port: 8000,
-            //host: '0.0.0.0'
-            host: 'localhost'
+            host: '0.0.0.0'
+            //host: 'localhost'
         });
         this.initControllers();
         this.start();
@@ -26,7 +26,7 @@ class BlockAPI {
      */
     initControllers() {
 
-        require('./BlockController.js')(this.server);
+        require('./StarNotaryController.js')(this.server);
     }
 
     async start() {
@@ -40,7 +40,6 @@ class BlockAPI {
             process.exit(1);
         }
     }
-
 }
 
-module.exports.BlockAPI = BlockAPI;
+module.exports.StarNotaryAPI = StarNotaryAPI;

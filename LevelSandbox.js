@@ -12,44 +12,98 @@ class LevelSandbox {
     }
 
     /**
-     * Get data from levelDB with key
-     * @param {*} key
+     * Returns an array of blocks associated with given address
      */
-    getLevelDBData(key){
+    getBlocksByAddress(address){
+
+        const self = this;
+        const result = [];
+
+        return new Promise((resolve, reject) => {
+
+            self.db.createValueStream()
+                .on('data', (data) => {
+
+                    const block = JSON.parse(data);
+                    if (block.body.address === address){
+                        result.push(block);
+                    }
+                })
+                .on('error', (err) => {
+
+                    reject(err);
+                })
+                .on('close', () => {
+
+                    resolve(result);
+                });
+        });
+    }
+
+    /**
+     * Finds block with given hash
+     */
+    getBlockByHash(hash){
 
         const self = this;
         return new Promise((resolve, reject) => {
 
-            self.db.get(key, (err, value) => {
+            self.db.createValueStream()
+                .on('data', (data) => {
+
+                    const block = JSON.parse(data);
+                    if (block.hash === hash){
+                        resolve(block);
+                    }
+                })
+                .on('error', (err) => {
+
+                    reject(err);
+                })
+                .on('close', () => {
+
+                    resolve(null);
+                });
+        });
+    }
+
+    /**
+     * Finds block by given height
+     */
+    getBlockByHeight(height){
+
+        const self = this;
+        return new Promise((resolve, reject) => {
+
+            self.db.get(height, (err, value) => {
 
                 if (err) {
-                    console.log(`LS: Value for key: [${key}] not found`, err);
                     reject(err);
                 }
-
-                resolve(value);
+                else {
+                    resolve(JSON.parse(value));
+                }
             });
         });
     }
 
     /**
-     * Add data to levelDB with key and value
-     * @param {*} key
-     * @param {*} value
+     * Stores block with given height
      */
-    addLevelDBData(key, value) {
+    saveBlock(height, block) {
 
         const self = this;
         return new Promise((resolve, reject) => {
 
-            self.db.put(key, value, (err) => {
+            const blockString = JSON.stringify(block);
+            self.db.put(height, blockString, (err) => {
 
                 if (err) {
-                    console.log('LS: Failed to store new value for key [' + key, err);
                     reject(err);
                 }
-
-                resolve(value);
+                else {
+                    resolve(block);
+                }
             });
         });
     }
@@ -70,7 +124,6 @@ class LevelSandbox {
                 })
                 .on('error', (err) => {
 
-                    console.log(`LS: getBlocsCount error: ${err}`);
                     reject(err);
                 })
                 .on('close', () => {

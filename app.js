@@ -1,7 +1,7 @@
 'use strict';
 
-const BlockAPI = require('./BlockAPI');
+const StarNotaryAPI = require('./StarNotaryApi.js');
 
-const server = new BlockAPI.BlockAPI();
+const server = new StarNotaryAPI.StarNotaryAPI();
 
 module.exports = server;

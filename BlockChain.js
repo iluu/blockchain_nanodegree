@@ -7,16 +7,19 @@ const Block = require('./Block.js');
 /**
  * Stores and validates blockchain using LevelDB
  */
-class Blockchain {
+class BlockChain {
 
     constructor() {
 
+        const story = Buffer.from('Genesis Star').toString('hex');
+        this.genesisStar = JSON.parse(`{ "address": "13Ps1qPQALKwXKYNPDi2enycoYEN2hZbGu", "star": { "dec": "25° 29' 23.9", "ra": "12h 50m 26.0s"}}`);
+        this.genesisStar.star.story = story;
         this.bd = new LevelSandbox.LevelSandbox();
     }
 
     generateGenesisBlock(){
 
-        const genesisBlock = new Block.Block('Genesis Block');
+        const genesisBlock = new Block.Block(this.genesisStar);
         genesisBlock.time = this.getCurrentTime();
         genesisBlock.hash = SHA256(JSON.stringify(genesisBlock)).toString();
 
@@ -30,7 +33,7 @@ class Blockchain {
             .then((height) => {
 
                 if (height === 0) {
-                    return self.bd.addLevelDBData(0, JSON.stringify(self.generateGenesisBlock()))
+                    return self.bd.saveBlock(0, self.generateGenesisBlock())
                         .then(() => {
 
                             return 1;
@@ -45,14 +48,14 @@ class Blockchain {
 
         const self = this;
         return self.getBlockHeight()
-            .then((it) => self.getBlock(it - 1))
+            .then((it) => self.getBlockByHeight(it - 1))
             .then((previousBlock) => {
 
                 block.height = previousBlock.height + 1;
                 block.previousBlockHash = previousBlock.hash;
                 block.time = self.getCurrentTime();
                 block.hash = SHA256(JSON.stringify(block)).toString();
-                return self.bd.addLevelDBData(block.height, JSON.stringify(block)).then(JSON.parse);
+                return self.bd.saveBlock(block.height, block);
             });
     }
 
@@ -61,14 +64,24 @@ class Blockchain {
         return new Date().getTime().toString().slice(0, -3);
     }
 
-    getBlock(height) {
+    getBlockByHash(hash){
+
+        return this.bd.getBlockByHash(hash);
+    }
+
+    getBlocksByAddress(address){
+
+        return this.bd.getBlocksByAddress(address);
+    }
+
+    getBlockByHeight(height) {
 
         const self = this;
         return this.getBlockHeight()
             .then((blockchainHeight) => {
 
                 if (height < blockchainHeight) {
-                    return self.bd.getLevelDBData(height).then(JSON.parse);
+                    return self.bd.getBlockByHeight(height);
                 }
 
                 return null;
@@ -77,7 +90,7 @@ class Blockchain {
 
     validateBlock(height) {
 
-        return this.getBlock(height)
+        return this.getBlockByHeight(height)
             .then((block) => {
 
                 const originalHash = block.hash;
@@ -91,14 +104,13 @@ class Blockchain {
     validateBlockInChain(height) {
 
         const blocks = [
-            this.getBlock(height),
-            this.getBlock(height + 1)
+            this.getBlockByHeight(height),
+            this.getBlockByHeight(height + 1)
         ];
         return Promise.all(blocks)
             .then((results) => {
 
                 results[0].hash = '';
-
                 const blockHash = SHA256(JSON.stringify(results[0])).toString();
                 return [results[0].height, (results[1].previousBlockHash === blockHash)];
             });
@@ -139,7 +151,7 @@ class Blockchain {
         const self = this;
         return new Promise((resolve, reject) => {
 
-            self.bd.addLevelDBData(height, JSON.stringify(block).toString())
+            self.bd.saveBlock(height, block)
                 .then((blockModified) => {
 
                     resolve(blockModified);
@@ -153,4 +165,4 @@ class Blockchain {
     }
 }
 
-module.exports.Blockchain = Blockchain;
+module.exports.BlockChain = BlockChain;
