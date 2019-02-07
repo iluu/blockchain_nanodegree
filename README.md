@@ -80,7 +80,7 @@ $ curl -v http://localhost:8000/message-signature/validate \
 </details>
 
 ### POST /block
-If wallet address was validated correctly, this method allows returns newly created block containing star data.
+If wallet address was validated correctly, this method allows registering a single star entry. Returns newly created block as a confirmation.
 
 ```bash
 curl -v http://localhost:8000/block \

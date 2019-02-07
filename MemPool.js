@@ -61,7 +61,12 @@ class MemPool {
 
     verifyAddressRequest(address){
 
-        return this.mempoolValid[address] !== undefined;
+        if (this.mempoolValid[address] !== undefined) {
+            delete this.mempoolValid[address];
+            return true;
+        }
+
+        return false;
     }
 
     verifyTimeLeft(req){

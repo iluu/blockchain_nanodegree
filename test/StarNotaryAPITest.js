@@ -211,6 +211,20 @@ describe('Star API of Notary Service handles', () => {
 
     });
 
+    it('POST /block and returns 400 Bad Request response on second try to register a star with the same address', async () => {
+
+        const response = await server.inject({
+            method: 'POST',
+            url: '/block',
+            payload: `{ "address": "1EauidThcsXuEAXoWxT3DG5D9Y8KvM2CDs",
+                        "star": { "dec": "68° 52' 56.9", "ra": "16h 29m 1.0s","story": "Found star using https://www.google.com/sky/" }}`
+        });
+
+        expect(response.statusCode).to.equal(400);
+        expect(response.result.message).to.be.equal(`Unable to add star: no valid request for '1EauidThcsXuEAXoWxT3DG5D9Y8KvM2CDs' found`);
+
+    });
+
     it('GET /stars/hash:{hash} and returns 404 not found when block does not exist ', async () => {
 
         const response = await server.inject({
