@@ -17,4 +17,4 @@ class ValidationRequest {
     };
 }
 
-module.exports.ValidationRequest = ValidationRequest;
+module.exports = ValidationRequest;

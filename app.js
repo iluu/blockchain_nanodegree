@@ -2,6 +2,6 @@
 
 const StarNotaryAPI = require('./StarNotaryApi.js');
 
-const server = new StarNotaryAPI.StarNotaryAPI();
+const server = new StarNotaryAPI();
 
 module.exports = server;

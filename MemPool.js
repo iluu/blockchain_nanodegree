@@ -24,7 +24,7 @@ class MemPool {
         const req = this.mempool[address];
 
         if (!req){
-            this.mempool[address] = new ValidationRequest.ValidationRequest(
+            this.mempool[address] = new ValidationRequest(
                 address,
                 this.currentTimestamp(),
                 this.validationTimeout / 1000);
@@ -85,7 +85,7 @@ class MemPool {
 
     moveToValidMempool(req){
 
-        const validRequest = new ValidRequest.ValidRequest(req);
+        const validRequest = new ValidRequest(req);
         this.mempoolValid[req.walletAddress] = validRequest;
 
         delete this.timeoutRequests[req.walletAddress];
@@ -106,4 +106,4 @@ class MemPool {
     }
 }
 
-module.exports.MemPool = MemPool;
+module.exports = MemPool;

@@ -15,4 +15,4 @@ class Block {
     }
 }
 
-module.exports.Block = Block;
+module.exports = Block;

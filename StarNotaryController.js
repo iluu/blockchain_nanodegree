@@ -18,8 +18,8 @@ class StarNotaryController {
     constructor(server) {
 
         this.server = server;
-        this.myBlockChain = new BlockChain.BlockChain();
-        this.mempool = new MemPool.MemPool(TimeoutRequestsWindowTime);
+        this.myBlockChain = new BlockChain();
+        this.mempool = new MemPool(TimeoutRequestsWindowTime);
 
         this.postRequestValidation();
         this.postValidateMessageSignature();
@@ -112,7 +112,7 @@ class StarNotaryController {
                 }
 
                 const data = this.encode(request);
-                const newBlock = new Block.Block(data);
+                const newBlock = new Block(data);
 
                 return this.myBlockChain
                     .addBlock(newBlock)

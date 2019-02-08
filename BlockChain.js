@@ -14,12 +14,12 @@ class BlockChain {
         const story = Buffer.from('Genesis Star').toString('hex');
         this.genesisStar = JSON.parse(`{ "address": "13Ps1qPQALKwXKYNPDi2enycoYEN2hZbGu", "star": { "dec": "25° 29' 23.9", "ra": "12h 50m 26.0s"}}`);
         this.genesisStar.star.story = story;
-        this.bd = new LevelSandbox.LevelSandbox();
+        this.bd = new LevelSandbox();
     }
 
     generateGenesisBlock(){
 
-        const genesisBlock = new Block.Block(this.genesisStar);
+        const genesisBlock = new Block(this.genesisStar);
         genesisBlock.time = this.getCurrentTime();
         genesisBlock.hash = SHA256(JSON.stringify(genesisBlock)).toString();
 
@@ -165,4 +165,4 @@ class BlockChain {
     }
 }
 
-module.exports.BlockChain = BlockChain;
+module.exports = BlockChain;

@@ -42,4 +42,4 @@ class StarNotaryAPI {
     }
 }
 
-module.exports.StarNotaryAPI = StarNotaryAPI;
+module.exports = StarNotaryAPI;

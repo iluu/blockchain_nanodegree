@@ -18,4 +18,4 @@ class ValidRequest {
     };
 }
 
-module.exports.ValidRequest = ValidRequest;
+module.exports = ValidRequest;
